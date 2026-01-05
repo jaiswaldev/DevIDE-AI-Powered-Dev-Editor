@@ -4,12 +4,8 @@ import { User } from 'lucide-react'
 import UserButton from '@/modules/auth/components/user-button'
 const Dashboard = () => {
   return (
-    <div> 
-      <h1>Welcome to the Devide App</h1>
-      <Button >
-        Get Started
-      </Button>
-      <UserButton/>
+    <div className="flex flex-col items-center justify-center h-screen"> 
+      Dashboard Page
     </div>
   )
 }

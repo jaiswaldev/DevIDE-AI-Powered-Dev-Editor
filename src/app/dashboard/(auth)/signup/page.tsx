@@ -25,15 +25,15 @@ const Signup = () => {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100 p-4">
-      <div className="w-full max-w-md space-y-8">
+    <div className="min-h-screen flex items-center justify-center p-4">
+      <div className="z-20 w-full max-w-md space-y-8">
         <div className="flex justify-center">
           <Image
             src="/login.svg"
             alt="Login"
-            height={120}
-            width={120}
-            className="object-cover"
+            height={300}
+            width={300}
+            className="z-20 object-cover"
           />
         </div>
         <SignInFormClient />

@@ -1,26 +1,20 @@
-"use client";
+import React from "react";
+import { Metadata } from "next";
+import DashboardLayoutClient from "./layout-client";
 
-import React, { useEffect } from "react";
-import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
+export const metadata: Metadata = {
+  title: {
+    template: " %s - VibeCode",
+    default: "VibeCode | Dashboard",
+  },
+};
 
 const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { status } = useSession();
-  const router = useRouter();
-
-  useEffect(() => {
-    if (status === "unauthenticated") {
-      router.replace("/dashboard/login");
-    }
-  }, [status, router]);
-
-  if (status === "loading") {
-    return (
-      <div className="min-h-screen flex items-center justify-center">Loading...</div>
-    );
-  }
-
-  return <>{children}</>;
+  return (
+    <DashboardLayoutClient>
+      {children}
+    </DashboardLayoutClient>
+  );
 };
 
 export default DashboardLayout;

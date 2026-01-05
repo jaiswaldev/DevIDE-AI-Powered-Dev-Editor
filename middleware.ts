@@ -28,8 +28,9 @@ export default auth((req) => {
     }
 
     // Protect /dashboard routes: only allow access when authenticated
-    if (pathname.startsWith("/dashboard") && !isLoggedIn) {
-        return Response.redirect(new URL("/dashboard/login", nextUrl));
+    // but allow access to auth routes (login/signup)
+    if (pathname.startsWith("/dashboard") && !isLoggedIn && !isAuthRoute) {
+        return Response.redirect(new URL("/dashboard/signup", nextUrl));
     }
 
     // Allow public routes
@@ -41,6 +42,7 @@ export default auth((req) => {
 export const config = {
     matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)", "/", "/auth/:path*"],
 };
+
 
 
 
