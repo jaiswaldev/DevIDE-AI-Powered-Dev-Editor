@@ -8,6 +8,9 @@ import { cn } from "@/lib/utils";
 import { ArrowUpRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import {Navbar} from "@/components/navbar/navbar";
+import { FooterWrapper } from "@/components/footer/footer-wrapper";
+
 
 export default function Home() {
   const { status } = useSession();
@@ -28,7 +31,9 @@ export default function Home() {
   }
 
   return (
-    <div className="z-20 flex flex-col items-center justify-start min-h-screen py-2">
+    <>
+    <Navbar />
+    <div className="z-20 flex flex-col items-center justify-start py-2">
      <div className="z-20 flex flex-col justify-center items-center my-5">
       <Image src={"/hero.svg"} alt="Hero-Section" height={500}  width={500}/>
       
@@ -45,7 +50,7 @@ export default function Home() {
         efficiently.
       </p>
       <div className="z-20">
-      <Link href={"/dashboard/signup"}>
+      <Link href={"/auth/signup"}>
         <Button variant={"brand"} className="mb-4" size={"lg"}>
           Get Started
           <ArrowUpRight className="w-3.5 h-3.5" />
@@ -53,6 +58,8 @@ export default function Home() {
       </Link>
       </div>
     </div>
+    <FooterWrapper />
+    </>
   );
 }
 

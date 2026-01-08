@@ -97,7 +97,17 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           token.email = existingUser.email;
           token.role = existingUser.role;
         } catch (error) {
-          logger.error("JWT callback error:", error as Error);
+          // If the database is unavailable, avoid noisy stack traces and return cached token info.
+          const msg = (error as any)?.message || String(error);
+          const isDbConnectErr = msg.includes('Error creating a database connection') || msg.includes('PrismaClientInitializationError') || msg.includes('DNS resolution') || msg.includes('os error 10013');
+          if (isDbConnectErr) {
+            logger.warn(
+              'JWT callback: database connection failed (Prisma). Returning cached token. Check MongoDB network access, Atlas IP whitelist, or local firewall.',
+              { detail: msg }
+            );
+          } else {
+            logger.error('JWT callback error - continuing with cached token:', error as Error);
+          }
         }
         return token;
      },

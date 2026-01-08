@@ -86,7 +86,7 @@ export function Navbar() {
                   {isLoggedIn ? (
                     <UserButton />
                   ) : (
-                    <Link href="/dashboard/signup">
+                    <Link href="/auth/signup">
                       <Button variant="default" size="sm">
                         Sign Up
                       </Button>

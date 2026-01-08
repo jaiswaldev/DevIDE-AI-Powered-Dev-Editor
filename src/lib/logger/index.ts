@@ -50,7 +50,9 @@ export const logger = {
     console.warn(formatMessage('warn', message, data));
   },
   error: (message: string, error?: Error | any) => {
-    console.error(formatMessage('error', message, error?.message || error));
+    const errMsg = error && (error.message || (typeof error === 'string' ? error : JSON.stringify(error)));
+    const display = errMsg && errMsg.length > 400 ? errMsg.slice(0, 400) + '... [truncated]' : errMsg || error;
+    console.error(formatMessage('error', message, display));
   },
   debug: (message: string, data?: any) => {
     if (isDevelopment) {

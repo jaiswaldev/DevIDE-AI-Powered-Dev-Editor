@@ -6,7 +6,7 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import SignInFormClient from "@/modules/auth/components/sign-in-form-client";
 
-const Signup = () => {
+const Login = () => {
   const { status } = useSession();
   const router = useRouter();
 
@@ -18,14 +18,14 @@ const Signup = () => {
 
   if (status === "authenticated") {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="flex items-center justify-center">
         Redirecting...
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
+    <div className="flex items-center justify-center p-4">
       <div className="z-20 w-full max-w-md space-y-8">
         <div className="flex justify-center">
           <Image
@@ -42,4 +42,4 @@ const Signup = () => {
   );
 };
 
-export default Signup;
+export default Login;

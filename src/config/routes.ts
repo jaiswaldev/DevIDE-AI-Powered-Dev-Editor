@@ -7,6 +7,6 @@ export const PublicRoutes = [
 ];
 
 export const AuthRoutes = [
-    "/dashboard/login",
-    "/dashboard/signup"
+    "/auth/login",
+    "/auth/signup"
 ];
