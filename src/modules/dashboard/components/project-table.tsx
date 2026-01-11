@@ -2,7 +2,7 @@
 "use client"
 
 import Image from "next/image"
-import { format } from "date-fns"
+import { format, set } from "date-fns"
 import type { Project } from "../types"
 import { Badge } from "@/components/ui/badge"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
@@ -70,14 +70,33 @@ export default function ProjectTable({
   
   const handleEditClick = (project: Project) => {
 //    Write your logic here
+     setSelectedProject(project);
+     setEditData({ title: project.title, description: project.description || "" });
+     setEditDialogOpen(true);
   }
 
   const handleDeleteClick = async (project: Project) => {
     //    Write your logic here
+    setSelectedProject(project);
+    setDeleteDialogOpen(true);
   }
 
   const handleUpdateProject = async () => {
    //    Write your logic here
+    if (!selectedProject || !onUpdateProject) return;
+
+    setIsLoading(true);
+    try {
+      await onUpdateProject(selectedProject.id, editData);
+      toast.success("Project updated successfully");
+      setEditDialogOpen(false);
+    }
+    catch (error) {
+      toast.error("Failed to update project");
+    }
+    finally {
+      setIsLoading(false);
+    }
   }
 
   const handleMarkasFavorite = async (project: Project) => {
@@ -86,14 +105,49 @@ export default function ProjectTable({
 
   const handleDeleteProject = async () => {
    //    Write your logic here
+    if (!selectedProject || !onDeleteProject) return;
+
+    setIsLoading(true);
+
+    try {
+      await onDeleteProject(selectedProject.id);
+      toast.success("Project deleted successfully");
+      setDeleteDialogOpen(false);
+      setSelectedProject(null);
+    } 
+    catch (error) {
+      toast.error("Failed to delete project");
+      console.error(error);
+    }
+    finally {
+      setIsLoading(false);
+    }
   }
 
   const handleDuplicateProject = async (project: Project) => {
     //    Write your logic here
+    if (!onDuplicateProject) return;
+
+    setIsLoading(true);
+    try {
+      await onDuplicateProject(project.id);
+      toast.success("Project duplicated successfully");
+    }   
+    catch (error) {
+      toast.error("Failed to duplicate project");
+      console.error(error);
+    }
+    finally {
+      setIsLoading(false);
+    }
+
   }
 
   const copyProjectUrl = (projectId: string) => {
     //    Write your logic here
+    const projectUrl = `${window.location.origin}/playground/${projectId}`;
+    navigator.clipboard.writeText(projectUrl);
+    toast.success("Project URL copied to clipboard");
   }
 
   return (
@@ -125,13 +179,17 @@ export default function ProjectTable({
                     {project.template}
                   </Badge>
                 </TableCell>
-                <TableCell>{format(new Date(project.createdAt), "MMM d, yyyy")}</TableCell>
+                <TableCell>
+                  <span>
+                     {format(new Date(project.createdAt), "MMM d, yyyy")}
+                  </span>
+                </TableCell>
                 <TableCell>
                   <div className="flex items-center gap-2">
                     <div className="w-8 h-8 rounded-full overflow-hidden">
                       <Image
                         src={project.user.image || "/placeholder.svg"}
-                        alt={project.user.name}
+                        alt={project.user.name || "User Avatar"}
                         width={32}
                         height={32}
                         className="object-cover"
@@ -241,7 +299,7 @@ export default function ProjectTable({
           <AlertDialogHeader>
             <AlertDialogTitle>Delete Project</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete "{selectedProject?.title}"? This action cannot be undone. All files and
+              Are you sure you want to delete "{selectedProject?.title}"? This action cannot be undo. All files and
               data associated with this project will be permanently removed.
             </AlertDialogDescription>
           </AlertDialogHeader>

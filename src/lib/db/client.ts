@@ -74,10 +74,19 @@ const wrapModel = (modelName: string, modelObj: any) => {
             return await orig.apply(target, args);
           } catch (err) {
             const msg = (err as any)?.message || String(err);
-            logger.warn(`Prisma model call failed: ${modelName}.${String(prop)} - returning safe default.`, { detail: msg });
-            // Safe defaults
-            if (String(prop) === 'findMany') return [];
-            if (String(prop).startsWith('find')) return null;
+            const propName = String(prop);
+            
+            // For write operations (create, update, delete), throw the error
+            // These operations should fail loudly, not silently
+            if (propName === 'create' || propName === 'update' || propName === 'delete' || propName === 'deleteMany' || propName === 'updateMany') {
+              logger.error(`Prisma write operation failed: ${modelName}.${propName}`, { detail: msg, error: err });
+              throw err; // Re-throw the error for write operations
+            }
+            
+            // For read operations, return safe defaults
+            logger.warn(`Prisma read operation failed: ${modelName}.${propName} - returning safe default.`, { detail: msg });
+            if (propName === 'findMany') return [];
+            if (propName.startsWith('find')) return null;
             return null;
           }
         };

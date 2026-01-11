@@ -1,7 +1,8 @@
-import { Playground as PrismaPlayground, User as PrismaUser } from "@prisma/client";
+import { Playground as PrismaPlayground, User as PrismaUser, StarMark as PrismaStarMark } from "@prisma/client";
 
 export type Playground = PrismaPlayground & {
   user: PrismaUser;
+  StarMark?: PrismaStarMark[];
 };
 
 export type PlaygroundWithUser = Playground;
@@ -25,9 +26,9 @@ export interface FormattedPlayground {
 
 export interface User{
   id: string
-  name: string
+  name: string | null
   email: string
-  image: string
+  image: string | null
   role: string
   createdAt: Date
   updatedAt: Date
@@ -37,11 +38,11 @@ export interface User{
 export interface Project{
    id: string
    title: string
-   description: string
+   description: string | null
    template: string
    createdAt: Date
    updatedAt: Date
    userId: string
    user: User
-   Starmark: {isMarked: boolean} []
+   Starmark?: {isMarked: boolean} []
 }

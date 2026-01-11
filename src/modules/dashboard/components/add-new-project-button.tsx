@@ -2,16 +2,56 @@
 "use client";
 
 import { Button } from "@/components/ui/button"
-// import { createPlayground } from "@/features/playground/actions";
 import { Plus } from 'lucide-react'
 import Image from "next/image"
 import { useRouter } from "next/navigation";
 import { useState } from "react"
 import { toast } from "sonner";
 import TemplateSelevtionModal from "./template-selection-modal"
+import { CreatePlayground } from "@/modules/dashboard/actions";
 
 const AddNewProjectButton = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedTemplate, setSelectedTemplate] = useState<{
+    title: string;
+    description?: string | undefined;
+    template: "REACT" | "NEXTJS" | "EXPRESS" | "VUE" | "HONO" | "ANGULAR";
+  } | null>(null);
+  const router = useRouter();
+
+  const handleSubmit = async (data: {
+    title: string;
+    description?: string | undefined;
+    template: "REACT" | "NEXTJS" | "EXPRESS" | "VUE" | "HONO" | "ANGULAR";
+  }) => {
+    try {
+      setSelectedTemplate(data);
+      // console.log("Creating Playground with data:", data);
+      const res = await CreatePlayground(data);
+      // console.log("Created Playground:", res);
+      
+      if (!res?.id){
+        toast.error("Failed to create project: No ID returned");
+        return;
+      }
+      
+      toast.success("Project created successfully");
+      setIsModalOpen(false);
+      
+      // Refresh the router cache to update the dashboard with the new project
+      router.refresh();
+      
+      // Navigate to the playground page after a short delay to ensure refresh completes
+      setTimeout(() => {
+        router.push(`/playground/${res.id}`);
+      }, 100);
+    } catch (error) {
+      console.error("Error creating playground:", error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      console.error("Error details:", errorMessage);
+      toast.error(`Failed to create project: ${errorMessage}`);
+    }
+  };
 
   return (
     <>
@@ -53,7 +93,7 @@ const AddNewProjectButton = () => {
       <TemplateSelevtionModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        onSubmit={()=>{}}
+        onSubmit={handleSubmit}
       />
     </>
   )

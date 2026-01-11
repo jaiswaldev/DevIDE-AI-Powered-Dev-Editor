@@ -36,7 +36,7 @@ type TemplateSelectionModalProps = {
     title: string;
     template: "REACT" | "NEXTJS" | "EXPRESS" | "VUE" | "HONO" | "ANGULAR";
     description?: string;
-  }) => void;
+  }) => void | Promise<void>;
 };
 
 interface TemplateOption {
@@ -176,7 +176,7 @@ const TemplateSelectionModal = ({
     }
   };
 
-  const handleCreateProject = () => {
+  const handleCreateProject = async () => {
     if (selectedTemplate) {
       const templateMap: Record<
         string,
@@ -193,16 +193,23 @@ const TemplateSelectionModal = ({
       const template = templates.find((t) => t.id === selectedTemplate);
       
 
-      onSubmit({
-        title: projectName || `New ${template?.name} Project`,
-        template: templateMap[selectedTemplate] || "REACT",
-        description: template?.description,
-      })
-      onClose();
-      // Reset state for next time
-      setStep("select");
-      setSelectedTemplate(null);
-      setProjectName("");
+      // Call onSubmit and wait for it to complete before closing/resetting
+      // The parent component (add-new-project-button) will handle closing the modal
+      try {
+        await onSubmit({
+          title: projectName || `New ${template?.name} Project`,
+          template: templateMap[selectedTemplate] || "REACT",
+          description: template?.description,
+        });
+        // Only reset state after successful submission
+        // Don't call onClose() here - let the parent handle it
+        setStep("select");
+        setSelectedTemplate(null);
+        setProjectName("");
+      } catch (error) {
+        // If submission fails, keep modal open so user can retry
+        console.error("Failed to submit project creation:", error);
+      }
     }
   };
 

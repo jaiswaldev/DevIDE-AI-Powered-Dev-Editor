@@ -29,8 +29,34 @@ export const getAccountByUserId = async (userId: string) => {
 }
 
 export const currentUser = async () => {
-   const user = await auth();
-   return user?.user;
+   try {
+     const session = await auth();
+     if (!session?.user?.email) {
+       return null;
+     }
+
+     // Look up the user in the database by email to get the correct database ID
+     const dbUser = await db.user.findUnique({
+       where: { email: session.user.email }
+     });
+
+     if (!dbUser) {
+       console.warn("[currentUser] User not found in database for email:", session.user.email);
+       return null;
+     }
+
+     // Return the database user with session user properties merged
+     return {
+       id: dbUser.id,
+       name: dbUser.name,
+       email: dbUser.email,
+       image: dbUser.image,
+       role: dbUser.role,
+     };
+   } catch (error) {
+     console.error("[currentUser] Error getting current user:", error);
+     return null;
+   }
 }
 
 

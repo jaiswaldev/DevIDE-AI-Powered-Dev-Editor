@@ -40,7 +40,15 @@ export default auth((req) => {
 });
 
 export const config = {
-    matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)", "/", "/auth/:path*"],
+    matcher: [
+        /*
+         * Match all request paths except for the ones starting with:
+         * - api (API routes)
+         * - _next (Next.js internal routes including server actions)
+         * - favicon.ico (favicon file)
+         */
+        "/((?!api|_next|favicon.ico).*)",
+    ],
 };
 
 
