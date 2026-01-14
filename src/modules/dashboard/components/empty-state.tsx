@@ -1,4 +1,5 @@
-import React from 'react'
+"use client"
+import React, { use } from 'react'
 
 const EmptyState = () => {
   return (

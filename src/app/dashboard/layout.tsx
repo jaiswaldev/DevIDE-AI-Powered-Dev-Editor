@@ -41,7 +41,7 @@ export default async function ({
   const formattedPlaygroundData: FormattedPlayground[] = (playgroundData || []).map((item)=>({
     id:item.id,
     name:item.title,
-    starred:false,
+    starred:item.StarMark?.[0]?.isMarked || false,
     icon: technologyIconMap[item.template] || "code2"
   }))
 

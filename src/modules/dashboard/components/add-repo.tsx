@@ -1,4 +1,4 @@
-
+"use client"
 import { Button } from "@/components/ui/button"
 import { ArrowDown } from "lucide-react"
 import Image from "next/image"

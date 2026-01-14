@@ -3,6 +3,7 @@ import { currentUser } from "@/modules/auth/actions/index";
 import { db } from "@/lib/db/client";
 import type { PlaygroundWithUser } from "../types";
 import { revalidatePath } from "next/cache";
+import { is } from "date-fns/locale";
 
 export const GetAllPlaygroundForUser = async (): Promise<PlaygroundWithUser[]> => {
   try {
@@ -24,6 +25,9 @@ export const GetAllPlaygroundForUser = async (): Promise<PlaygroundWithUser[]> =
         StarMark: {
           where: {
             userId: user.id,
+          },
+          select:{
+            isMarked: true
           },
         },
       },
@@ -259,6 +263,55 @@ export const DuplicatePlayground = async (playgroundId: string): Promise<void> =
   } catch (error) {
     console.error("Error duplicating playground:", error);
     throw error;
+  }
+};
+
+export const toggleStarMarked = async (playgroundId: string, isMarked: boolean): Promise<{ success: boolean; error?: string; isMarked: boolean }> => {
+  try {
+    const user = await currentUser();
+
+    if (!user?.id) {
+      throw new Error("User not authenticated");
+    }
+
+    const playground = await db.playground.findUnique({
+      where: { id: playgroundId },
+    });
+
+    if (!playground || playground.userId !== user.id) {
+      throw new Error("Unauthorized to update this playground");
+    }
+
+    const existingMark = await db.starMark.findFirst({
+      where: {
+        playgroundId,
+        userId: user.id,
+      },
+    });
+
+    if (existingMark) {
+      // Update existing mark
+      await db.starMark.delete({
+        where: { id: existingMark.id },
+      });
+    } else {
+      // Create new mark
+      await db.starMark.create({
+        data: {
+          playgroundId,
+          userId: user.id,
+          isMarked,
+        },
+      });
+    }
+
+    revalidatePath("/dashboard");
+
+    return { success: true, isMarked };
+  } catch (error) {
+    console.error("Error toggling star mark:", error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    return { success: false, error: errorMessage, isMarked: false };
   }
 };
 
