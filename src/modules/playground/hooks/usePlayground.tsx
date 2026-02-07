@@ -8,7 +8,7 @@ import { set } from "date-fns";
 
 interface PlaygroundData {
    id: string;
-   name?: string;
+   title?: string;
    template?: string;
    [key: string]: any;
 }

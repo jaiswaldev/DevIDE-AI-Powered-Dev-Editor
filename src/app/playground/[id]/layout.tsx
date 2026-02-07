@@ -9,7 +9,7 @@ export default function PlaygroundLayout({
 }) {
   return (
     <SidebarProvider>
-      <div className="z-20 w-full">
+      <div className="flex w-full">
         {children}
       </div>
     </SidebarProvider>
